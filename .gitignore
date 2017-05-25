@@ -1,0 +1,14 @@
+build/.idea
+build/packager
+build/bin/node.exe
+build/lib/build.config.js
+build/lib/packager.config.js
+
+
+updateServer/.idea
+updateServer/package
+updateServer/assets
+updateServer/patch
+updateServer/temp
+updateServer/bin/node.exe
+updateServer/lib/config.json

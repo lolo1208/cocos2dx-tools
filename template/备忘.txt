@@ -1,0 +1,71 @@
+
+
+
+Cocos2d Console
+---------------------------------------------------------------------------------
+cocos new ProjectName -l js
+cocos new projectName -l js --no-native
+
+cocos compile -p android -m debug
+cocos compile -p android -m debug --android-studio
+cocos compile -p android -m debug --android-studio --ap android-19
+
+cocos compile -p android -m release --android-studio
+
+cocos jscompile -s ./ -d ./
+
+
+
+WebStrom 设置
+---------------------------------------------------------------------------------
+File Watchers
+-p $ProjectFileDir$ -f $FileDirRelativeToProjectRoot$\$FileName$
+
+编译
+-p $ProjectFileDir$ -b
+
+清理
+-p $ProjectFileDir$ -c
+
+
+
+VisualStudio 生成步骤
+---------------------------------------------------------------------------------
+rd /s /q $(OutDir)bin-release
+rd /s /q $(OutDir)version
+rd /s /q $(OutDir)script
+rd /s /q $(OutDir)res
+C:/LOLO/Project/cocos/tools/build/bin/packager.cmd -n ShibaInu -v 0.0.0 -p $(ProjectDir)..\..\..\ -a $(OutDir)
+
+---------------------------------------------------------------------------------
+rd /s /q $(OutDir)bin-debug
+rd /s /q $(OutDir)version
+rd /s /q $(OutDir)script
+rd /s /q $(OutDir)res
+xcopy "$(ProjectDir)..\..\cocos2d-x\cocos\scripting\js-bindings\script" "$(OutDir)\script" /D /E /I /F /Y
+xcopy "$(ProjectDir)..\..\..\bin-debug" "$(OutDir)\bin-debug" /D /E /I /F /Y
+xcopy "$(ProjectDir)..\..\..\res" "$(OutDir)\res" /D /E /I /F /Y
+copy "$(ProjectDir)..\..\..\project.json" "$(OutDir)\" /Y
+copy "$(ProjectDir)..\..\..\main.js" "$(OutDir)\" /Y
+copy "$(ProjectDir)..\..\..\Launcher.js" "$(OutDir)\" /Y
+copy "$(ProjectDir)..\..\..\Updater.js" "$(OutDir)\" /Y
+
+
+
+系统变量
+---------------------------------------------------------------------------------
+ANDROID_SDK_ROOT = D:\Android\sdk
+ANT_ROOT = D:\Java\apache-ant-1.8.2\bin
+NDK_ROOT = D:\Android\ndk
+
+PATH:
+%COCOS_CONSOLE_ROOT%
+%COCOS_TEMPLATES_ROOT%
+%ANT_ROOT%
+%NDK_ROOT%
+%ANDROID_SDK_ROOT%\tools
+%ANDROID_SDK_ROOT%\platform-tools
+
+
+
+

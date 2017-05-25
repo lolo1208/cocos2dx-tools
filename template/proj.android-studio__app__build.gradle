@@ -1,0 +1,89 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "22.0.1"
+
+    defaultConfig {
+        applicationId "org.cocos2dx.ShibaInu"
+        minSdkVersion 10
+        targetSdkVersion 19
+        versionCode 1
+        versionName "1.0"
+    }
+
+    sourceSets.main {
+        java.srcDir "src"
+        res.srcDir "res"
+        jniLibs.srcDir "libs"
+        manifest.srcFile "AndroidManifest.xml"
+        assets.srcDir "assets"
+    }
+
+    signingConfigs {
+
+       release {
+            if (project.hasProperty("RELEASE_STORE_FILE")) {
+                storeFile file(RELEASE_STORE_FILE)
+                storePassword RELEASE_STORE_PASSWORD
+                keyAlias RELEASE_KEY_ALIAS
+                keyPassword RELEASE_KEY_PASSWORD
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (project.hasProperty("RELEASE_STORE_FILE")) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile project(':libcocos2dx')
+}
+
+
+task cleanAssets(type: Delete) {
+    delete 'assets'
+}
+
+task copyAssets(type: Copy) {
+    from('../../../cocos2d-x/cocos/scripting/js-bindings/') {
+        include 'script/**'
+    }
+    from('../../../../') {
+        include 'res/**'
+        include 'bin-debug/**'
+        include 'main.js'
+        include 'project.json'
+    }
+    into 'assets'
+}
+
+
+
+task packager(type: Exec, description: '执行打包脚本'){
+    def pakCmd = [
+		'C:/LOLO/Project/cocos/tools/build/bin/packager.cmd',
+		'-n', 'ShibaInu',
+		'-v', '0.0.0',
+		'-p', 'C:/LOLO/Project/cocos/ShibaInu',
+		'-a', 'C:/LOLO/Project/cocos/ShibaInu/frameworks/runtime-src/proj.android-studio/app/assets'
+	]
+    commandLine  pakCmd
+}
+
+
+
+
+clean.dependsOn cleanAssets
+// preBuild.dependsOn copyAssets
+
+packager.dependsOn cleanAssets
+preBuild.dependsOn packager
