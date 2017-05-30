@@ -30,7 +30,7 @@ args
     .option('-r, --release', '是否构建 release 版本，默认 false')
     .parse(process.argv);
 
-var NODE_PATH = "../bin/node";
+var NODE_PATH = (process.platform == "win32") ? "../bin/node" : "node";
 var P_DIR = formatDirPath(args.projectDir);
 
 var OUT_DIR = "bin-" + (args.release ? "release" : "debug") + "/";

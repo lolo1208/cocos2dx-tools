@@ -44,7 +44,7 @@ var P_NAME = args.projectName;// 项目名称
 var COCOS2D_CONSOLE_PATH = config.cocos2dConsolePath;
 if (os.platform() == "win32") COCOS2D_CONSOLE_PATH += ".bat";
 
-var NODE_PATH = "../bin/node";
+var NODE_PATH = (process.platform == "win32") ? "../bin/node" : "node";
 var RELEASE = "bin-release/";
 
 var V_3 = args.projectVersion;// 传入的3位版本号
