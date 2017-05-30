@@ -142,12 +142,43 @@ function buildNextModule() {
 
     p_tsc = child.spawn(NODE_PATH, cArgs);
     p_tsc.on("exit", function (/*code, signal*/) {
+        replaceCallSuper(jsFile);
         console.log("[compiled] " + jsFile);
         pConfig.changedModules.shift();
         saveConfig();
         buildNextModule();
     });
 }
+
+
+/**
+ * 替换 super() 调用方式
+ * @param file
+ * @param str
+ */
+function replaceCallSuper(file, str) {
+    var isInit = str == null;// 第一次进来匹配
+    if (isInit) str = fs.readFileSync(file, "utf8");
+    var index = str.indexOf(CALL_SUPER_REPLACE_KEYWORD);
+    if (index == -1) {
+        if (!isInit) fs.writeFileSync(file, str);
+        return;
+    }
+
+    var iStart = str.lastIndexOf("_super.call", index);
+    var iEnd = str.indexOf(";", iStart);
+    var callSuperStr = str.substring(iStart, iEnd);
+    var callCtorStr = callSuperStr.replace(/_super/, "this.ctor");
+    var middleStr = str.substring(iEnd + 1, index);
+    var sourceStr = str.substring(iStart, index + CALL_SUPER_REPLACE_KEYWORD.length);
+
+    str = str.replace(sourceStr,
+        "lolo.isNative ? " + callCtorStr + " : " + callSuperStr + ";" + middleStr
+    );
+
+    replaceCallSuper(file, str);// 递归匹配
+}
+var CALL_SUPER_REPLACE_KEYWORD = "lolo.CALL_SUPER_REPLACE_KEYWORD();";
 
 
 /**
