@@ -31,9 +31,16 @@ var P_DIR = args.projectDir;
 var US_DIR = formatDirPath(args.updateServer);
 var BIN_UNPACK = US_DIR + "bin/unpack";
 var BIN_STARTUP = US_DIR + "bin/startup";
+var NODE_PATH;
 if (process.platform == "win32") {
+    NODE_PATH = "../bin/node";
     BIN_UNPACK += ".cmd";
     BIN_STARTUP += ".cmd";
+}
+else {
+    NODE_PATH = "node";
+    BIN_UNPACK += ".sh";
+    BIN_STARTUP += ".sh";
 }
 
 
@@ -52,7 +59,7 @@ function packager() {
     args.push("-n", P_NAME);
     args.push("-p", P_DIR);
     args.push("-v", P_VER);
-    var p_packager = child.spawn("../bin/node", args, ["cwd"]);
+    var p_packager = child.spawn(NODE_PATH, args, ["cwd"]);
     p_packager.stdout.setEncoding('utf8');
     p_packager.stdout.on("data", function (data) {
         var index = data.lastIndexOf(".zip");
@@ -85,7 +92,9 @@ function packager() {
 ////////////////////////////////
 function unpack() {
     console.log("copy to updateServer");
-    fs.writeFileSync(US_DIR + "package/" + version + ".zip", fs.readFileSync(zipPath));
+    var packageDir = US_DIR + "package/";
+    createDir(packageDir);
+    fs.writeFileSync(packageDir + version + ".zip", fs.readFileSync(zipPath));
     console.log("unpack");
 
     var args = [];
@@ -131,3 +140,22 @@ function formatDirPath(dirPath) {
     if (dirPath.substring(dirPath.length - 1) != "/") dirPath += "/";
     return dirPath;
 }
+
+
+/**
+ * 创建文件夹，包括父目录
+ * @param path
+ */
+function createDir(path) {
+    path = path.replace(/\\/g, "/");
+    var arr = path.split("/");
+    path = arr[0];
+    for (var i = 1; i < arr.length; i++) {
+        if (arr[i] == "") continue;
+        path += "/" + arr[i];
+        if (!fs.existsSync(path)) {
+            fs.mkdirSync(path);
+        }
+    }
+}
+

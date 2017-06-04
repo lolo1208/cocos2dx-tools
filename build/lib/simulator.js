@@ -41,11 +41,17 @@ var BIN_UNPACK = US_DIR + "bin/unpack";// unpack 脚本
 var BIN_STARTUP = US_DIR + "bin/startup";// startup 脚本
 var S_DIR = null;// 模拟器资源根目录
 if (process.platform == "win32") {
+    NODE_PATH = "../bin/node";
     BIN_UNPACK += ".cmd";
     BIN_STARTUP += ".cmd";
     S_DIR = P_DIR + "frameworks/runtime-src/proj.win32/Debug.win32/";
 }
-
+else {
+    NODE_PATH = "node";
+    BIN_UNPACK += ".sh";
+    BIN_STARTUP += ".sh";
+    S_DIR = P_DIR + "frameworks/runtime-src/proj.ios_mac/assets/";
+}
 
 var zipPath = null;// 打出来的zip包路径
 var version = null;// 四位版本号
@@ -68,9 +74,14 @@ function clearDir() {
     removeDir(S_DIR + "res");
 
     console.log("clear writablePath");
-    removeDir(WP_DIR + "assets");
-    removeDir(WP_DIR + "patch");
-
+    if (process.platform == "win32") {
+        removeDir(WP_DIR + "assets");
+        removeDir(WP_DIR + "patch");
+    }
+    else {
+        removeDir(WP_DIR);
+    }
+    
     console.log("clear updateServer");
     removeDir(US_DIR + "assets");
     removeDir(US_DIR + "package");
@@ -93,7 +104,7 @@ function packager() {
     args.push("-p", P_DIR);
     args.push("-v", P_VER);
     args.push("-a", S_DIR);
-    var p_packager = child.spawn("../bin/node", args, ["cwd"]);
+    var p_packager = child.spawn(NODE_PATH, args, ["cwd"]);
     p_packager.stdout.setEncoding('utf8');
     p_packager.stdout.on("data", function (data) {
         var index = data.lastIndexOf(".zip");
