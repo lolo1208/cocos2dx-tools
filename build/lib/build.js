@@ -13,7 +13,13 @@ var path = require('path');
 
 var args = require("./node_modules/commander");
 
-require("./build.config");
+try {
+    require("./build.config");
+}
+catch (err) {
+    console.log("[ERROR] load build.config fail!");
+    config = {};
+}
 
 
 args.projectDir = null;
@@ -101,7 +107,7 @@ if (args.build) {
     try {
         if (pConfig.pid != 0) process.kill(pConfig.pid);
     }
-    catch (error) {
+    catch (err) {
     }
     pConfig.pid = process.pid;
     buildNextModule();
@@ -126,7 +132,16 @@ function buildNextModule() {
 
     moduleName = pConfig.changedModules[0];
     cArgs = ["node_modules/typescript/bin/tsc"];
-    findTS(P_DIR + moduleName);
+    try {
+        findTS(P_DIR + moduleName);
+    }
+    catch (err) {
+        console.log("[ERROR] no such directory : " + P_DIR + moduleName);
+        pConfig.changedModules.shift();
+        saveConfig();
+        buildNextModule();
+        return;
+    }
 
     moduleName = moduleName.substring(4, moduleName.length - 1);
     moduleName = moduleName.replace(/\//g, ".");
@@ -219,6 +234,12 @@ function findTS(dir) {
         }
     }
 }
+
+
+//
+
+
+//
 
 
 /**
