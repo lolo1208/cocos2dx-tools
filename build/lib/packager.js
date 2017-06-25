@@ -199,6 +199,8 @@ function copyResFile(oldFile, newFile) {
 
     var resType = arr[0];// 文件类型
     var fileName = arr[arr.length - 1];// 文件名称
+    if (fileName == undefined) return;
+
     var extname = fileName.substr(fileName.lastIndexOf(".") + 1);// 后缀名
     switch (resType) {
         case "xml":
