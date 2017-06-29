@@ -89,6 +89,7 @@ if (args.clean || args.release) {
             file = files[n];
             if (i == 1 && file == "module") continue;
             if (i == 2 && (file == "app" || file == "js")) continue;
+            if (file == ".DS_Store")continue;
             addChangedModule(M_LIST[i] + file + "/");
         }
     }
