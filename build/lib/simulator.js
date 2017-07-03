@@ -35,23 +35,34 @@ args
 var P_NAME = args.projectName;// 项目名称
 var P_VER = args.projectVersion;// 3位版本号
 var P_DIR = args.projectDir;// 项目根目录
-var US_DIR = formatDirPath(args.updateServer);// 更新服务器根目录
-var WP_DIR = formatDirPath(args.writablePath);// writablePath
-var BIN_UNPACK = US_DIR + "bin/unpack";// unpack 脚本
-var BIN_STARTUP = US_DIR + "bin/startup";// startup 脚本
+
+var ignoreUpdateServer = args.updateServer == null;// 是否忽略更新服务器相关操作
+var US_DIR, BIN_UNPACK, BIN_STARTUP;
+if (!ignoreUpdateServer) {
+    var US_DIR = formatDirPath(args.updateServer);// 更新服务器根目录
+    var BIN_UNPACK = US_DIR + "bin/unpack";// unpack 脚本
+    var BIN_STARTUP = US_DIR + "bin/startup";// startup 脚本
+}
+
 var S_DIR = null;// 模拟器资源根目录
 if (process.platform == "win32") {
+    if (!ignoreUpdateServer) {
+        BIN_UNPACK += ".cmd";
+        BIN_STARTUP += ".cmd";
+    }
     NODE_PATH = "../bin/node";
-    BIN_UNPACK += ".cmd";
-    BIN_STARTUP += ".cmd";
     S_DIR = P_DIR + "frameworks/runtime-src/proj.win32/Debug.win32/";
 }
 else {
+    if (!ignoreUpdateServer) {
+        BIN_UNPACK += ".sh";
+        BIN_STARTUP += ".sh";
+    }
     NODE_PATH = "node";
-    BIN_UNPACK += ".sh";
-    BIN_STARTUP += ".sh";
     S_DIR = P_DIR + "frameworks/runtime-src/proj.ios_mac/assets/";
 }
+
+var WP_DIR = formatDirPath(args.writablePath);// writablePath
 
 var zipPath = null;// 打出来的zip包路径
 var version = null;// 四位版本号
@@ -81,13 +92,15 @@ function clearDir() {
     else {
         removeDir(WP_DIR);
     }
-    
-    console.log("clear updateServer");
-    removeDir(US_DIR + "assets");
-    removeDir(US_DIR + "package");
-    removeDir(US_DIR + "patch");
-    removeDir(US_DIR + "temp");
-    createDir(US_DIR + "package");
+
+    if (!ignoreUpdateServer) {
+        console.log("clear updateServer");
+        removeDir(US_DIR + "assets");
+        removeDir(US_DIR + "package");
+        removeDir(US_DIR + "patch");
+        removeDir(US_DIR + "temp");
+        createDir(US_DIR + "package");
+    }
 
     packager();
 }
@@ -125,7 +138,8 @@ function packager() {
         console.log("zip path : " + zipPath);
         console.log(" version : " + version);
         console.log("-------------------------------------------------\n");
-        unpack();
+
+        if (!ignoreUpdateServer) unpack();
     });
 }
 
