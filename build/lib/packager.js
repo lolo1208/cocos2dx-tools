@@ -211,6 +211,9 @@ function copyResFile(oldFile, newFile) {
         case "ani":
             if (extname != "ani") return;
             break;
+        case "map":
+            if (extname == "txt" || extname == "zip") return;
+            break;
 
         // 字体文件名必须和字体名称一致，不能添加md5字符串，直接拷贝
         case "font":
