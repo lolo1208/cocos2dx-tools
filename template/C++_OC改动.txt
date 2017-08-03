@@ -1,0 +1,58 @@
+
+
+
+Classes/AppDelegate.cpp
+-----------------------------------------------------------------------
+#include "../Classes/auto/lolo_auto.hpp"
+
+sc->addRegisterCallback(register_all_lolo);
+
+
+
+cocos/ui/UIEditBox/UIEditBox.h
+-----------------------------------------------------------------------
+// 新增（public）
+/**
+ * 打开键盘
+ * 因坐标系更改，导致UIWidget Touch hitTest时，坐标判断有误，需要在js层判断是否点中，然后调用该方法弹出键盘
+ */
+void openKeyboard(void);
+
+
+
+cocos/ui/UIEditBox/UIEditbox.cpp
+-----------------------------------------------------------------------
+// 新增
+void EditBox::openKeyboard(void)
+{
+    _editBoxImpl->openKeyboard();
+}
+
+
+
+cocos/ui/UIEditBox/UIEditBoxImpl-win32.cpp
+-----------------------------------------------------------------------
+// 修改
+void EditBoxImplWin::setContentSize(const Size& size)
+{
+    _label->setSystemFontSize(size.height - 12);
+    _label->setPosition(Vec2(CC_EDIT_BOX_PADDING, size.height / 2.0f));
+    _labelPlaceHolder->setSystemFontSize(size.height - 12);
+    _labelPlaceHolder->setPosition(CC_EDIT_BOX_PADDING, size.height / 2.0f);
+    _editSize = size;
+}
+
+
+
+runtime-src/proj.ios_mac/ios/AppController.mm
+------------------------------------------------------------------------
+// 修改
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+    // ...
+	
+    [_viewController.view setMultipleTouchEnabled:YES];// 开启多点触摸
+    return YES;
+}
+
+
