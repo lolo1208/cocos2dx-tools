@@ -23,7 +23,7 @@ args.projectDir = null;
 args.updateServer = null;
 args.writablePath = null;
 args
-    .version('0.0.1')
+    .version('0.1.0')
     .option('-n, --projectName <string>', '项目名称')
     .option('-p, --projectDir <string>', '项目根目录')
     .option('-v, --projectVersion <string>', '3位版本号')
@@ -39,13 +39,13 @@ var P_DIR = args.projectDir;// 项目根目录
 var ignoreUpdateServer = args.updateServer == null;// 是否忽略更新服务器相关操作
 var US_DIR, BIN_UNPACK, BIN_STARTUP;
 if (!ignoreUpdateServer) {
-    var US_DIR = formatDirPath(args.updateServer);// 更新服务器根目录
-    var BIN_UNPACK = US_DIR + "bin/unpack";// unpack 脚本
-    var BIN_STARTUP = US_DIR + "bin/startup";// startup 脚本
+    US_DIR = formatDirPath(args.updateServer);// 更新服务器根目录
+    BIN_UNPACK = US_DIR + "bin/unpack";// unpack 脚本
+    BIN_STARTUP = US_DIR + "bin/startup";// startup 脚本
 }
 
 var S_DIR = null;// 模拟器资源根目录
-if (process.platform == "win32") {
+if (process.platform === "win32") {
     if (!ignoreUpdateServer) {
         BIN_UNPACK += ".cmd";
         BIN_STARTUP += ".cmd";
@@ -85,7 +85,7 @@ function clearDir() {
     removeDir(S_DIR + "res");
 
     console.log("clear writablePath");
-    if (process.platform == "win32") {
+    if (process.platform === "win32") {
         removeDir(WP_DIR + "assets");
         removeDir(WP_DIR + "patch");
     }
@@ -117,14 +117,15 @@ function packager() {
     args.push("-p", P_DIR);
     args.push("-v", P_VER);
     args.push("-a", S_DIR);
+    if (ignoreUpdateServer) args.push("-i");
     var p_packager = child.spawn(NODE_PATH, args, ["cwd"]);
     p_packager.stdout.setEncoding('utf8');
     p_packager.stdout.on("data", function (data) {
         var index = data.lastIndexOf(".zip");
-        if (index != -1) {
+        if (index !== -1) {
             var path = data.substr(0, index).replace(/\\/g, "/");
             index = path.lastIndexOf("\n");
-            if (index != -1) path = path.substr(index + 1);
+            if (index !== -1) path = path.substr(index + 1);
 
             index = path.lastIndexOf("/");
             zipPath = path + ".zip";
@@ -134,12 +135,13 @@ function packager() {
     });
     p_packager.on("exit", function (code/*, signal*/) {
         console.log("packager finished. exit code:" + code);
-        console.log("\n-------------------------------------------------");
-        console.log("zip path : " + zipPath);
-        console.log(" version : " + version);
-        console.log("-------------------------------------------------\n");
-
-        if (!ignoreUpdateServer) unpack();
+        if (!ignoreUpdateServer) {
+            console.log("\n-------------------------------------------------");
+            console.log("zip path : " + zipPath);
+            console.log(" version : " + version);
+            console.log("-------------------------------------------------\n");
+            unpack();
+        }
     });
 }
 
@@ -194,7 +196,7 @@ function startup() {
 function formatDirPath(dirPath) {
     if (dirPath == null) return null;
     dirPath = dirPath.replace(/\\/g, "/");
-    if (dirPath.substring(dirPath.length - 1) != "/") dirPath += "/";
+    if (dirPath.substring(dirPath.length - 1) !== "/") dirPath += "/";
     return dirPath;
 }
 
@@ -229,7 +231,7 @@ function createDir(path) {
     var arr = path.split("/");
     path = arr[0];
     for (var i = 1; i < arr.length; i++) {
-        if (arr[i] == "") continue;
+        if (arr[i] === "") continue;
         path += "/" + arr[i];
         if (!fs.existsSync(path)) {
             fs.mkdirSync(path);
@@ -247,7 +249,7 @@ function copyDir(oldDir, newDir) {
     oldDir = formatDirPath(oldDir);
     newDir = formatDirPath(newDir);
     var files = fs.readdirSync(oldDir);
-    if (files.length == 0) return;
+    if (files.length === 0) return;
     createDir(newDir);
     for (var i = 0; i < files.length; i++) {
         var oldFile = oldDir + files[i];

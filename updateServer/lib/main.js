@@ -25,7 +25,7 @@ var config = JSON.parse(fs.readFileSync("./config.json", "utf8"));
 // 结束掉正在运行的更新程序
 if (config.pid > 0) {
     try {
-        if (config.pid != 0) process.kill(config.pid);
+        if (config.pid !== 0) process.kill(config.pid);
     }
     catch (error) {
     }
@@ -42,7 +42,7 @@ var server = http.createServer(function (request, response) {
     // response.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
 
     // 只做更新服务
-    if (pathname != "/update") {
+    if (pathname !== "/update") {
         responseError(response);
         return;
     }
@@ -94,10 +94,10 @@ function getVersion(response, version, coreVersion) {
     var md5 = "";
 
     // 需要重新下载app
-    if (coreVersion != config.coreVersion) {
+    if (coreVersion !== config.coreVersion) {
     }
     // 需要下载补丁包
-    else if (version != config.version) {
+    else if (version !== config.version) {
         if (createPatch(version, config.version)) {
             var zipPath = PATCH_DIR + version + "-" + config.version + ".zip";
             if (!fs.existsSync(zipPath)) {// 创建补丁包失败
@@ -139,7 +139,7 @@ function getPatch(response, version, range) {
     var size = fs.statSync(zipPath).size;
 
     var pos = parseInt(/^bytes=([0-9]+)-$/.exec(range)[1]);
-    if (pos == 0) {
+    if (pos === 0) {
         response.setHeader("Accept-Ranges", "bytes");
         response.setHeader("Content-Length", size);
     }
@@ -191,7 +191,7 @@ function responseError(response) {
  */
 function getFileMD5(pathOrBuffer) {
     // 传入的是路径
-    if (typeof pathOrBuffer == 'string' && pathOrBuffer.constructor == String) {
+    if (typeof pathOrBuffer === 'string' && pathOrBuffer.constructor === String) {
         pathOrBuffer = fs.readFileSync(pathOrBuffer);
     }
     var hash = crypto.createHash('md5');

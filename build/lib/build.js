@@ -28,7 +28,7 @@ args.build = false;
 args.clean = false;
 args.release = false;
 args
-    .version('0.0.1')
+    .version('0.1.0')
     .option('-p, --projectDir <string>', '项目根目录')
     .option('-f, --file <string>', '传入文件有变动，将所属的模块标记为有改变')
     .option('-b, --build', '编译有改变的模块')
@@ -36,7 +36,7 @@ args
     .option('-r, --release', '是否构建 release 版本，默认 false')
     .parse(process.argv);
 
-var NODE_PATH = (process.platform == "win32") ? "../bin/node" : "node";
+var NODE_PATH = (process.platform === "win32") ? "../bin/node" : "node";
 var P_DIR = formatDirPath(args.projectDir);
 
 var OUT_DIR = "bin-" + (args.release ? "release" : "debug") + "/";
@@ -62,9 +62,9 @@ var i, file;
 ////////////////////////////////
 if (args.file) {
     file = args.file.replace(/\\/g, "/");
-    if (file.substring(0, 4) == "src/") {
+    if (file.substring(0, 4) === "src/") {
         for (i = 0; i < M_LIST.length; i++) {
-            if (file.indexOf(M_LIST[i]) != -1) {
+            if (file.indexOf(M_LIST[i]) !== -1) {
                 var matcher = new RegExp(M_LIST[i] + "(.*?)" + "/");
                 moduleName = file.match(matcher)[0];
                 addChangedModule(moduleName);
@@ -87,9 +87,9 @@ if (args.clean || args.release) {
         files = fs.readdirSync(P_DIR + M_LIST[i]);
         for (n = 0; n < files.length; n++) {
             file = files[n];
-            if (i == 1 && file == "module") continue;
-            if (i == 2 && (file == "app" || file == "js")) continue;
-            if (file == ".DS_Store")continue;
+            if (i === 1 && file === "module") continue;
+            if (i === 2 && (file === "app" || file === "js")) continue;
+            if (file === ".DS_Store") continue;
             addChangedModule(M_LIST[i] + file + "/");
         }
     }
@@ -106,7 +106,7 @@ if (args.clean || args.release) {
 if (args.build) {
     // 杀掉之前正在编译的进程
     try {
-        if (pConfig.pid != 0) process.kill(pConfig.pid);
+        if (pConfig.pid !== 0) process.kill(pConfig.pid);
     }
     catch (err) {
     }
@@ -124,7 +124,7 @@ if (args.build) {
 function buildNextModule() {
 
     // 全部编译完成
-    if (pConfig.changedModules.length == 0) {
+    if (pConfig.changedModules.length === 0) {
         delete config[P_DIR];
         saveConfig();
         console.log("compile completed!");
@@ -176,7 +176,7 @@ function replaceCallSuper(file, str) {
     var isInit = str == null;// 第一次进来匹配
     if (isInit) str = fs.readFileSync(file, "utf8");
     var index = str.indexOf(CALL_SUPER_REPLACE_KEYWORD);
-    if (index == -1) {
+    if (index === -1) {
         if (!isInit) fs.writeFileSync(file, str);
         return;
     }
@@ -202,7 +202,7 @@ var CALL_SUPER_REPLACE_KEYWORD = "lolo.CALL_SUPER_REPLACE_KEYWORD();";
  * @param moduleName
  */
 function addChangedModule(moduleName) {
-    if (pConfig.changedModules.indexOf(moduleName) == -1) {
+    if (pConfig.changedModules.indexOf(moduleName) === -1) {
         pConfig.changedModules.push(moduleName);
     }
 }
@@ -229,7 +229,7 @@ function findTS(dir) {
             findTS(file + "/");
         }
         else {
-            if (file.substring(file.length - 3) == ".ts") {
+            if (file.substring(file.length - 3) === ".ts") {
                 cArgs.push(file);
             }
         }
@@ -272,6 +272,6 @@ function removeDir(path) {
 function formatDirPath(dirPath) {
     if (dirPath == null) return null;
     dirPath = dirPath.replace(/\\/g, "/");
-    if (dirPath.substring(dirPath.length - 1) != "/") dirPath += "/";
+    if (dirPath.substring(dirPath.length - 1) !== "/") dirPath += "/";
     return dirPath;
 }

@@ -15,7 +15,7 @@ require("./createPatch");
 
 args.projectVersion = null;
 args
-    .version('0.0.1')
+    .version('0.1.0')
     .option('-v, --projectVersion <string>', '4位版本号')
     .parse(process.argv);
 
@@ -41,7 +41,7 @@ zipper.sync.unzip(packagePath).save(ASSETS_DIR);
 var config = JSON.parse(fs.readFileSync("./config.json", "utf8"));
 if (config.pid > 0) {
     try {
-        if (config.pid != 0) process.kill(config.pid);
+        if (config.pid !== 0) process.kill(config.pid);
         console.log("update process killed");
     }
     catch (error) {
@@ -65,7 +65,7 @@ console.log("   core version : " + config.coreVersion);
 var md5FileList = fs.readdirSync(MD5_DIR);
 var md5FileNum = md5FileList.length;
 for (var i = 0; i < 2; i++) {
-    if (i == md5FileNum) break;
+    if (i === md5FileNum) break;
     var md5File = md5FileList[md5FileNum - i - 1];
     var md5FileName = md5File.substr(0, md5File.length - 4);
     createPatch(md5FileName, VERSION);
@@ -87,7 +87,7 @@ function createDir(path) {
     var arr = path.split("/");
     path = arr[0];
     for (var i = 1; i < arr.length; i++) {
-        if (arr[i] == "") continue;
+        if (arr[i] === "") continue;
         path += "/" + arr[i];
         if (!fs.existsSync(path)) {
             fs.mkdirSync(path);

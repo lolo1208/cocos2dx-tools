@@ -24,27 +24,27 @@ args.projectName = null;
 args.projectVersion = null;
 args.projectDir = null;
 args.appDir = null;
+args.ignoreZip = false;
 args
-    .version('0.0.1')
+    .version('0.1.0')
     .option('-n, --projectName <string>', '项目名称')
     .option('-v, --projectVersion <string>', '3位版本号')
     .option('-p, --projectDir <string>', '项目根目录')
-
     .option('-a, --appDir <string>', '正在打包的APP目录（打补丁包无需传入）')
-
+    .option('-i, --ignoreZip', '是否无需生成zip包')
     .parse(process.argv);
 
 
+var P_NAME = args.projectName;// 项目名称
 var P_DIR = formatDirPath(args.projectDir);
 var APP_DIR = formatDirPath(args.appDir);
-var isApp = APP_DIR != null;// 是否在打app包
-
-var P_NAME = args.projectName;// 项目名称
+var isApp = APP_DIR !== null;// 是否在打app包
+var ignoreZip = args.ignoreZip;// 无需生成zip包
 
 var COCOS2D_CONSOLE_PATH = config.cocos2dConsolePath;
-if (os.platform() == "win32") COCOS2D_CONSOLE_PATH += ".bat";
+if (os.platform() === "win32") COCOS2D_CONSOLE_PATH += ".bat";
 
-var NODE_PATH = (process.platform == "win32") ? "../bin/node" : "node";
+var NODE_PATH = (process.platform === "win32") ? "../bin/node" : "node";
 var RELEASE = "bin-release/";
 
 var V_3 = args.projectVersion;// 传入的3位版本号
@@ -199,20 +199,20 @@ function copyResFile(oldFile, newFile) {
 
     var resType = arr[0];// 文件类型
     var fileName = arr[arr.length - 1];// 文件名称
-    if (fileName == undefined) return;
+    if (fileName === undefined) return;
 
     var extname = fileName.substr(fileName.lastIndexOf(".") + 1);// 后缀名
     switch (resType) {
         case "xml":
             return;
         case "ui":
-            if (extname != "ui") return;
+            if (extname !== "ui") return;
             break;
         case "ani":
-            if (extname != "ani") return;
+            if (extname !== "ani") return;
             break;
         case "map":
-            if (extname == "txt" || extname == "zip") return;
+            if (extname === "txt" || extname === "zip") return;
             break;
 
         // 字体文件名必须和字体名称一致，不能添加md5字符串，直接拷贝
@@ -322,7 +322,7 @@ function buildFinish() {
 //
 ////////////////////////////////
 function createZip() {
-    console.log("generates zip...");
+    if (!ignoreZip) console.log("generates zip...");
     var zipPath = PACK_DIR + V_4 + ".zip";
 
     // 记录 main.js、Launcher.js、project.json MD5，以及 resList
@@ -340,14 +340,15 @@ function createZip() {
     fs.writeFileSync(md5File, JSON.stringify(md5List));
 
     // 生成zip文件
-    zipper.sync.zip(BUILD_DIR).compress().save(zipPath);
+    if (!ignoreZip) {
+        zipper.sync.zip(BUILD_DIR).compress().save(zipPath);
+        console.log("generates zip finished. path:");
+        console.log(path.resolve(zipPath));
+    }
 
     // 删除md5文件夹
     fs.unlinkSync(md5File);
     fs.rmdirSync(md5Dir);
-
-    console.log("generates zip finished. path:");
-    console.log(path.resolve(zipPath));
 
     if (isApp) copyScript();
     else allFinish();
@@ -429,7 +430,7 @@ function allFinish() {
  */
 function getFileMD5(pathOrBuffer) {
     // 传入的是路径
-    if (typeof pathOrBuffer == 'string' && pathOrBuffer.constructor == String) {
+    if (typeof pathOrBuffer === 'string' && pathOrBuffer.constructor === String) {
         pathOrBuffer = fs.readFileSync(pathOrBuffer);
     }
     var hash = crypto.createHash('md5');
@@ -448,7 +449,7 @@ function createDir(path) {
     var arr = path.split("/");
     path = arr[0];
     for (var i = 1; i < arr.length; i++) {
-        if (arr[i] == "") continue;
+        if (arr[i] === "") continue;
         path += "/" + arr[i];
         if (!fs.existsSync(path)) {
             fs.mkdirSync(path);
@@ -465,7 +466,7 @@ function removeEmptyDir(path) {
     path = formatDirPath(path);
 
     var files = fs.readdirSync(path);
-    if (files.length == 0) {
+    if (files.length === 0) {
         fs.rmdirSync(path);
     }
     else {
@@ -489,7 +490,7 @@ function copyDir(oldDir, newDir) {
     oldDir = formatDirPath(oldDir);
     newDir = formatDirPath(newDir);
     var files = fs.readdirSync(oldDir);
-    if (files.length == 0) return;
+    if (files.length === 0) return;
     createDir(newDir);
     for (var i = 0; i < files.length; i++) {
         var oldFile = oldDir + files[i];
@@ -519,7 +520,7 @@ function copyFile(oldFile, newFile) {
 function formatDirPath(dirPath) {
     if (dirPath == null) return null;
     dirPath = dirPath.replace(/\\/g, "/");
-    if (dirPath.substring(dirPath.length - 1) != "/") dirPath += "/";
+    if (dirPath.substring(dirPath.length - 1) !== "/") dirPath += "/";
     return dirPath;
 }
 

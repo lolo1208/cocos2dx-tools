@@ -1,4 +1,5 @@
 /**
+ * 打补丁包
  * Created by LOLO on 2017/4/11.
  */
 
@@ -28,7 +29,7 @@ var mainResList = ["main.jsc", "Launcher.jsc", "Updater.jsc", "project.json"];
  * @param toVer 到这个版本
  */
 createPatch = function (fromVer, toVer) {
-    if (fromVer == toVer) return true;
+    if (fromVer === toVer) return true;
 
     // 补丁包已经存在了
     var zipPath = PATCH_DIR + fromVer + "-" + toVer + ".zip";
@@ -54,7 +55,7 @@ createPatch = function (fromVer, toVer) {
     var fRes = fromMD5.resList;
     var tRes = toMD5.resList;
     for (var key in tRes) {
-        if (tRes[key] != fRes[key]) {
+        if (tRes[key] !== fRes[key]) {
 
             var index = key.lastIndexOf("/");
             var path = key.substr(0, index);// 资源路径
@@ -63,7 +64,7 @@ createPatch = function (fromVer, toVer) {
             var extname = fileName.substr(index + 1);// 后缀名
             fileName = fileName.substr(0, index);
 
-            var isModule = path == "module";// [ true:代码模块，false:资源文件 ]
+            var isModule = path === "module";// [ true:代码模块，false:资源文件 ]
             if (isModule) path = "bin-release";
             else path = "res/" + LOCALE + "/" + path;
             createDir(packDir + path);
@@ -79,7 +80,7 @@ createPatch = function (fromVer, toVer) {
     var i = 0, len = mainResList.length;
     for (; i < len; i++) {
         var mainRes = mainResList[i];
-        if (toMD5[mainRes] != fromMD5[mainRes]) {
+        if (toMD5[mainRes] !== fromMD5[mainRes]) {
             copyFile(ASSETS_DIR + mainRes, packDir + mainRes);
         }
     }
@@ -121,7 +122,7 @@ function createDir(path) {
     var arr = path.split("/");
     path = arr[0];
     for (var i = 1; i < arr.length; i++) {
-        if (arr[i] == "") continue;
+        if (arr[i] === "") continue;
         path += "/" + arr[i];
         if (!fs.existsSync(path)) {
             fs.mkdirSync(path);
