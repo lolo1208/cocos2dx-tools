@@ -164,6 +164,8 @@ function buildNextModule() {
         saveConfig();
         buildNextModule();
     });
+    p_tsc.stdout.on("data", function(data) {});
+    p_tsc.stderr.on("data", function(data) {});
 }
 
 

@@ -9,7 +9,7 @@ sc->addRegisterCallback(register_all_lolo);
 
 
 
-cocos/ui/UIEditBox/UIEditBox.h
+cocos/ui/widgets/UIEditBox/UIEditBox.h
 -----------------------------------------------------------------------
 // 新增（public）
 /**
@@ -20,7 +20,7 @@ void openKeyboard(void);
 
 
 
-cocos/ui/UIEditBox/UIEditbox.cpp
+cocos/ui/widgets/UIEditBox/UIEditbox.cpp
 -----------------------------------------------------------------------
 // 新增
 void EditBox::openKeyboard(void)
@@ -30,7 +30,7 @@ void EditBox::openKeyboard(void)
 
 
 
-cocos/ui/UIEditBox/UIEditBoxImpl-win32.cpp
+cocos/ui/widgets/UIEditBox/UIEditBoxImpl-win32.cpp
 -----------------------------------------------------------------------
 // 修改
 void EditBoxImplWin::setContentSize(const Size& size)
@@ -40,6 +40,19 @@ void EditBoxImplWin::setContentSize(const Size& size)
     _labelPlaceHolder->setSystemFontSize(size.height - 12);
     _labelPlaceHolder->setPosition(CC_EDIT_BOX_PADDING, size.height / 2.0f);
     _editSize = size;
+}
+
+
+
+
+
+
+cocos/ui/widgets/UIEditBox/iOS/CCUIEditBixIOS.mm
+-----------------------------------------------------------------------
+// 修改
+- (void)setPlaceholderTextColor:(UIColor *)color
+{
+    // self.textInput.ccui_placeholderLabel.textColor = color;// 注释掉这一行
 }
 
 
